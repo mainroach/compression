@@ -1,0 +1,42 @@
+{
+    "id": 1,
+    "jsonrpc": "2.0",
+    "total": 1,
+    "max_id":276372795494133760,
+    "result": [
+        {
+            "id": 0,
+            "guid": "2084d344-81fe-4714-9e2a-42c83b46083b",
+            "isActive": true,
+            "balance": "$1,507.00",
+            "picture": "http://placehold.it/32x32",
+            "age": 24,
+            "latitude": -85.791587,
+            "longitude": -64.615557,
+            "tags": [
+                "quis",
+                "est",
+                "ea",
+                "velit",
+                "exercitation",
+                "quis",
+                "veniam"
+            ],
+            "friends": [
+                {
+                    "id": 0,
+                    "name": "Sanford Patton"
+                },
+                {
+                    "id": 1,
+                    "name": "Tameka Frazier"
+                },
+                {
+                    "id": 2,
+                    "name": "Gilliam Leach"
+                }
+            ],
+            "randomArrayItem": "apple"
+        }
+    ]
+}
