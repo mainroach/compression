@@ -11,59 +11,13 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 #limitations under the License.'''
-import urllib
-import xml.dom.minidom as minidom
-import subprocess
-import os.path
+
 import json
-import logging
-import csv
+import argparse
 import sys
-import datetime
 import math
-import fnmatch
-import operator
-import os, os.path
-from subprocess import call
 
 
-'''usage : fetchHARData.py amazon.har'''
-#======================================
-def giveFilesWithExtention(mypath,ext):
-    matches = []
-    for root, dirnames, filenames in os.walk(mypath):
-        for filename in fnmatch.filter(filenames, '*.' + ext):
-            matches.append(os.path.join(root, filename))
-    return matches
-#======================================
-def safeDirCheck(path):
-    if not os.path.exists(path): os.makedirs(path)    
-#======================================
-def genHAR(url,outFile):
-    os.system("phantomjs.exe netsniff.js " + url + " > " + outFile)
-#======================================
-def cacheURLData(url,outFile,isBinary):
-
-    respData=[]
-    try:
-        f = urllib.urlopen(url)
-        respData = f.read()
-    except Exception:
-        #print "Couldn't load " + url + "\n"
-        return
-    
-    #cache to disk directly
-    safeDirCheck(outFile.replace(os.path.basename(outFile),""))
-    fl = None
-    if(isBinary):
-        fl = open(outFile,'wb')
-    else:
-        fl = open(outFile,'w')
-    fl.write(respData);
-    fl.close();
-#======================================
-def giveFilenameFromURL(url):
-    return os.path.basename(url)
 #======================================
 def giveExthard(pth):
     pthlen = len(pth)
@@ -116,7 +70,7 @@ def guessContentType(mimetype,name):
                 return (typ[3], "." +ext,typ[4])
 
  
-    #print "UNKNOWN object:\'" + mimetype + "\' for " + name
+    print "UNKNOWN object:\'" + mimetype + "\' for " + name
     
 
     return ("","",False)
@@ -229,22 +183,28 @@ def grabAssets(harFile):
 
 #===============================================
 if __name__ == '__main__':
-    harFile = sys.argv[1]
-    costPerGig = sys.argv[2] #eg 0.12 cents
-    numDailyUsers = sys.argv[3] #eg 1,000,000
-   
-    byteCountDict = grabAssets(harFile)
 
-    typeCosts = estCosts(byteCountDict,float(costPerGig),float(numDailyUsers))
+    parser = argparse.ArgumentParser(description='HAR Cost Estimater')
+
+    parser.add_argument('inFile', type=str, nargs=1, help='input HAR file name')
+    
+    parser.add_argument('-dailyusers', dest='numDailyUsers', type=int, default=1000000, help='Number of daily visitors (default: 1000000)')
+    parser.add_argument('-gigcost', dest='costPerGig', type=float, default=0.12, help='Cost to transfer 1gb of data from your server (default: 0.12 cents)')
+
+    args = parser.parse_args()
+
+    byteCountDict = grabAssets(args.inFile[0])
+
+    typeCosts = estCosts(byteCountDict,float(args.costPerGig),float(args.numDailyUsers))
 
 
     #simplistic print of the data.
     totalBytes = 0
     totalCost = 0
     
-    print "Site : " + harFile
-    print "Est. # Users : " + str(numDailyUsers)
-    print "Est. $ / gig : " + str(costPerGig)
+    print "Site : " + args.inFile[0]
+    print "Est. # Users : " + str(args.numDailyUsers)
+    print "Est. $ / gig : " + str(args.costPerGig)
     
 
     print "Assets: cost per year"
