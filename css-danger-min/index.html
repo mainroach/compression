@@ -1,0 +1,231 @@
+<!--Copyright 2013 Google Inc. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+#limitations under the License.-->
+
+<script src="CSSParser.js"></script><!-- javascript parser from http://www.glazman.org/JSCSSP/freshmeat.html-->
+Enter your CSS below, and check the console for output:<br> (if you enter nothing, we will use some testing data to validate searches)
+<textarea style="width: 100%" rows="15" id="source" spellcheck="false"></textarea>
+
+<button onclick="javascript:GO()">GO</button>
+<script>
+
+//Let's do these in phases, see if we can detect each of these conditions based upon the post-parsed data
+//http://www.lotterypost.com/css-compress.aspx
+
+/*******************************
+SEMI-SAFE
+/********************************/
+
+function findLowerCaseTargets(data)
+{
+    if(data == "")
+        data = "H1.myTitle[class=myClass] {\nFONT-FAMILY: Arial;\nCOLOR: #FF1934;\nBACKGROUND: URL(/myImage.GIF);\n}"
+    sheet = parse(data);
+    
+    console.log(sheet)
+
+    //CLM NOTE that this parser we're using will automatically lowercase all the things that don't need uppercasing, so this is an invalid test for our cases. This code left here as proof for others.
+
+    //pass 1 collect all of the used property names
+    var numUpper = 0;
+    for(var i = 0; i < sheet.cssRules.length; i++)
+    {
+        for(var q = 0; q < sheet.cssRules[i].declarations.length; q++)
+        {
+            prop = sheet.cssRules[i].declarations[q].property;
+
+            for(var strIdx = 0; strIdx < prop.length;strIdx++)
+                if(prop.charAt(strIdx) != prop.charAt(strIdx).toLowerCase())
+                    numUpper++;
+        }    
+    }
+
+    console.log("there are " + numUpper + " uppercase characters in property names");
+
+}
+
+function findOverwrittenRulesSimple(data)
+{
+   //note this doesn't produce the most combinable, but semi-combinible blocks..
+    if(data == "")
+        data = "mo{margin-top: 10px;margin-right: 0;margin-top: 8px;margin-left: 30px;}"
+    sheet = parse(data);
+
+    
+    for(var i = 0; i < sheet.cssRules.length; i++)
+    {
+        var reused=false;
+        var propDict={};
+        if (sheet.cssRules[i].declarations ==null)continue;
+        for(var q = 0; q < sheet.cssRules[i].declarations.length; q++)
+        {
+            prop = sheet.cssRules[i].declarations[q].property;
+            if (prop in propDict)
+            {
+                console.log("\t" + sheet.cssRules[i].mSelectorText + " overwrote " + prop + " in declarations.")
+                break;
+            }
+            else
+            {
+                propDict[prop]=true;
+            }       
+        }    
+    }
+}
+function findDuplicateBlocks(data)
+{
+    if(data == "")
+        data = "#element {margin: 0;}#element {color: #000000;}"
+    sheet = parse(data);
+    
+
+    var used={};
+    for(var i = 0; i < sheet.cssRules.length; i++)
+    {
+        if(sheet.cssRules[i].mSelectorText in used)
+            continue
+
+        var locations=[];
+        for(var q = i+1; q < sheet.cssRules.length; q++)
+        {
+            if(sheet.cssRules[i].mSelectorText == sheet.cssRules[q].mSelectorText)
+                locations.push(q)
+        }
+        if (locations.length > 0)
+        {
+            locations.push(i);
+            console.log("\t"+sheet.cssRules[i].mSelectorText + " declared " + locations.length + " times")
+        }
+        used[sheet.cssRules[i].mSelectorText]=1;
+    }
+}
+
+/*******************************
+DANGEROUS
+/********************************/
+function containsMultiPropertyContaining(cssRuleObj,searchText)
+{
+
+    var fontCount=0
+    if(cssRuleObj.declarations == null) return false;
+
+        for(var q = 0; q < cssRuleObj.declarations.length; q++)
+        {
+            decl = cssRuleObj.declarations[q];
+            if (decl.property.indexOf(searchText) !=-1)
+                fontCount+=1;
+        }    
+
+    return (fontCount > 1);
+}
+
+function findFontStyleCollapse(data)
+{
+    if(data == "")
+        data = "mo{font-family: Arial;\nfont-size: 12px;\nfont-weight: bold;}"
+    sheet = parse(data);
+
+    for(var i = 0; i < sheet.cssRules.length; i++)
+    {
+        if (containsMultiPropertyContaining(sheet.cssRules[i],"font"))
+            console.log("\t"+sheet.cssRules[i].parsedCssText);
+    }
+}
+
+function findMarginPaddingBorderLonghand(data)
+{
+    if(data == "")
+        data = "mo{margin-top: 10px;margin-right: 0;margin-bottom: 8px;margin-left: 30px;}"
+    sheet = parse(data);
+
+    for(var i = 0; i < sheet.cssRules.length; i++)
+    {
+        if (containsMultiPropertyContaining(sheet.cssRules[i],"margin") ||
+            containsMultiPropertyContaining(sheet.cssRules[i],"padding") ||
+            containsMultiPropertyContaining(sheet.cssRules[i],"border"))
+            console.log("\t"+sheet.cssRules[i].parsedCssText);
+    }
+}
+
+
+
+function findCombineableBlocks(data)
+{
+    //note this doesn't produce the most combinable, but semi-combinible blocks..
+    if(data == "")
+        data = "#element1 {margin: 0;}#element2 {margin: 0;}"
+    sheet = parse(data);
+    
+
+    //pass 1 collect all of the used property names
+    var propDict={};
+    for(var i = 0; i < sheet.cssRules.length; i++)
+    {
+        if(sheet.cssRules[i].declarations == null) continue;
+        for(var q = 0; q < sheet.cssRules[i].declarations.length; q++)
+        {
+            prop = sheet.cssRules[i].declarations[q].property;
+            if (prop in propDict)
+            {
+                propDict[prop].push(i);
+            }
+            else
+            {
+                propDict[prop]=[i];
+            }       
+        }    
+    }
+
+    console.log("\t"+propDict);
+}
+
+
+var changes=[
+    
+    {"name":"Overwritten rules","type":"semi-safe","fcn":findOverwrittenRulesSimple},    
+    {"name":"Remove / merge duplicate blocks","type":"semi-safe","fcn":findDuplicateBlocks},
+
+    {"name":"Combines font styles","type":"not safe","fcn":findFontStyleCollapse},
+    {"name":"Combines margins, paddings, borders","type":"not safe","fcn":findMarginPaddingBorderLonghand},
+    {"name":"Merge blocks sharing properties","type":"not safe","fcn":findCombineableBlocks},
+]
+
+
+
+
+function parse(text)
+{
+    var parser = new CSSParser();
+    var sheet = parser.parse(text, false, true);
+    return sheet;
+}
+
+function GO()
+{
+
+    var source = document.getElementById("source");
+    var dat = source.value;
+
+    for(var i =0; i < changes.length; i++)
+    {
+        console.log(changes[i].name)
+        changes[i].fcn(dat);
+    }
+}
+
+//FUN TO TEST : https://plus.google.com/_/scs/apps-static/_/ss/k=oz.home.-xehbl99qooof.L.W.O/am=FREcBhk0WNggABAAgQMIAAEAgAE/rs=AItRSTPHCzVHskN_w2Y2psuc7SYIC3PnZQ
+
+</script>
+
+
+
