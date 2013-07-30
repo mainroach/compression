@@ -1,0 +1,46 @@
+a {text-decoration:none;}
+#tmpl_register_page1, #tmpl_register_page2, #tmpl_new_registered_ok { padding:0 10px 20px 10px; overflow:hidden; }
+#ffadult #tmpl_register_page1, #ffadult #tmpl_register_page2, #ffadult #tmpl_new_registered_ok { padding:20px 10px; overflow:hidden; }
+  #dcb #tmpl_register_page1, #dcb #tmpl_register_page2, #dcb #tmpl_new_registered_ok { padding:20px 0; }
+.reg_left_wrapper  { float:left; width:220px; text-align:center; }
+.reg_right_wrapper { float:right; width:700px; padding-bottom:10px; text-align:left; }
+.piclist_container { font-weight:700; font-size:11px; padding-bottom:10px; }
+.piclist_title { font-size:14px; margin:7px 0 0 0; font-weight:700; padding:5px; }
+#tmpl_new_registered_ok .piclist_title { font-weight:700; font-size:12px; margin-bottom:10px; text-align:center; width:50%; margin:0 auto; }
+.reg_left_wrapper tr { background-color:transparent !important; }
+.reg_page_title { color:#999999; border-bottom:2px solid #666666; font-size:20px; font-weight:700; letter-spacing:-1px; margin:0; padding:5px 0; }
+.reg_thumbs_location { font-size:10px; }
+.reg_name_age { color:#3366CC; }
+.reg_error_wrapper { background-color:#FFEE80; color:#000000; border:1px solid red; padding:10px; margin-bottom:10px; }
+.reg_error_title { font-size:16px; font-weight:700; }
+.reg_error_wrapper ul { margin:5px 0; }
+.reg_error_wrapper li { color:red; list-style-type:none; margin:0 0 2px 0; }
+.error_out { font-weight:400; color:red; font-size:11px; margin:3px 0 3px 31%; }
+.checkmark { width:16px; float:right; height:20px; }
+.checkmark .red { width:20px; height:20px; background:url('http://graphics.pop6.com/images/common/red_x.png') no-repeat; }
+.checkmark .green { width:20px; height:20px; background:url('http://graphics.pop6.com/images/common/check-grn.png') no-repeat; }
+.checkmark .gray { width:20px; height:20px; background:url('http://graphics.pop6.com/images/common/check-gry.png') no-repeat; }
+.section_title { clear:both; background-color:#DDDDDD; color:#000000; font-weight:700; padding:2px; margin:5px 0 5px 0;  }
+.reg_required_text { color:#FD7B00; margin:5px 0 10px 0; padding:0; font-size:12px; text-align:right; }
+.reg_required { color:#FD7B00; font-weight:400; font-size:12px;  }
+.reg_question_wrapper  { width:100%; float:left; margin:0 0 10px 0; }
+.reg_question { width:30%; float:left; font-weight:700; margin:0 10px 0 0; text-align:right; padding:2px 0 0 0; }   
+.reg_answer { width:64%; float:left; }
+.reg_username_desc, .reg_need_email { margin:5px 0 0 0; font-size:10px; width:60%; }
+#tmpl_register_page2 .reg_username_desc { width:70%; }
+.reg_intro_input { width:439px;}
+input[type="text"], input[type="password"], textarea { padding:2px 4px; font-family:arial, sans-serif; font-size:100%;}
+#tmpl_register_page1 label { position:relative; left:-3px; }
+.reg_password { width:275px !important; } 
+.reg_create_passowrd { margin:0 0 0 275px !important; }
+#recaptcha_table { background-color:#FFFFFF; }
+.captcha { margin:10px 0 0 25%; }
+.numbered_section { margin:15px 0 0 0; }
+.number { float:left; font-weight:bold; font-size:28px; }
+.steps_wrapper { float:left; margin:13px 0 0 10px; } 
+.steps_wrapper .rcm { padding:0; }
+#map { border:1px solid #000000; overflow:hidden !important; }
+.disc { color:#666666; }
+#footer { clear:both; }
+
+
