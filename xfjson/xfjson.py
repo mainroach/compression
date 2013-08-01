@@ -19,6 +19,7 @@ import sys
 import math
 import shutil, errno
 import operator
+import argparse
 
 
 '''
@@ -439,13 +440,9 @@ class BinaryJSON(object):
     
        
 #=========================================
-def decodeJSON(srcData, outFile,):
+def decodeJSON(srcData, outFile):
 
-    jsdata=[]
-    with open(inFile,'rb') as f: 
-        #read the file here
-        jsdata = f.read()
-        f.close()
+    jsdata=srcData
 
     #is this a binary file or a text file?
     #print str(int(jsdata[0]))
@@ -504,7 +501,7 @@ def encodeJSONObjToText(jsonObj):
 def encodeJSON(inFile,outFile, dataTransposeMode,doBinPack):
 
     jsdata=[]
-    with open(inFile,'r') as f: 
+    with open(inFile,'rb') as f: 
         #read the file here
         jsdata = f.read()
         f.close()
@@ -556,34 +553,27 @@ if __name__ == '__main__':
     doBinaryFormat=False
     dataTransposeMode=0 # 0 = none, 1 = non recoverable, 2 = recoverable
 
-    if len(sys.argv) <3:
-        print "Usage : xfjson.py <options> infile outfile"
-        print "\t -t : do data transpose, no reversal"
-        print "\t -tr : do data transpose, allow reversal"
-        print "\t -b : output binary format (compressor only)"
-        print "\t -d : decompress"
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description='JSON encoder')
 
-    for i in range(1,len(sys.argv)):
-        if sys.argv[i] == "-d":
-            mode = False
-        elif sys.argv[i] == "-b":
-            doBinaryFormat = True
-        elif sys.argv[i] == "-t":
-            dataTransposeMode = 1
-        elif sys.argv[i] == "-tr":
-            dataTransposeMode = 2
-            
+    parser.add_argument('inFile', type=str, nargs=1, help='input file name')
+    parser.add_argument('outFile', type=str, nargs=1, help='output file name')
+    
 
-    #find the first param that doesn't have a "-" in front.
-    paramPos = 1
-    for paramPos in range(1,len(sys.argv)):
-        if sys.argv[paramPos][0] != "-":
-            break
+    parser.add_argument('-b', action='store_true', default=False, help='Do binary formatting.')
+    parser.add_argument('-t', dest='doTrans', required=True, type=int, default=0, help='Transpose mode; 0=None, 1=Transpose non recoverable, 2= transpose recoverable')    
+    parser.add_argument('-d', action='store_false', default=True, help='Decompress')
 
+    
+    args = parser.parse_args()
 
-    inFile = sys.argv[paramPos]
-    outFile = sys.argv[paramPos+1]
+    mode = args.d
+    doBinaryFormat = args.b
+    dataTransposeMode = dataTransposeMode=2
+    
+
+    inFile = args.inFile[0]
+    outFile = args.outFile[0]
+    print inFile
     
     
     if mode == True:
