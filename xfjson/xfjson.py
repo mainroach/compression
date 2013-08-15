@@ -440,9 +440,14 @@ class BinaryJSON(object):
     
        
 #=========================================
-def decodeJSON(srcData, outFile):
+def decodeJSON(inFile, outFile):
 
-    jsdata=srcData
+
+    jsdata=[]
+    with open(inFile,'rb') as f: 
+        #read the file here
+        jsdata = f.read()
+        f.close()
 
     #is this a binary file or a text file?
     #print str(int(jsdata[0]))
