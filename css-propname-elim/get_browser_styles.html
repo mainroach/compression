@@ -1,0 +1,14 @@
+<body>
+    <div id = "data">  </div>
+</body>
+
+<script>
+str="";
+str += Object.keys(document.body.style).length + "<br>";
+for(var i in document.body.style) {
+    str += i + "<br>";
+}
+document.getElementById("data").innerHTML = str;
+</script>
+
+
